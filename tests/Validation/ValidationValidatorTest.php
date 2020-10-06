@@ -61,7 +61,7 @@ class ValidationValidatorTest extends TestCase
         ]);
 
         $this->assertFalse($v->passes());
-        $this->assertEquals('post name is required', $v->errors()->all()[0]);
+        $this->assertSame('post name is required', $v->errors()->all()[0]);
     }
 
     public function testSometimesWorksOnNestedArrays()
@@ -4602,19 +4602,19 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, [], []);
 
         $implicit_no_connection = $v->parseTable(ImplicitTableModel::class);
-        $this->assertEquals(null, $implicit_no_connection[0]);
+        $this->assertNull($implicit_no_connection[0]);
         $this->assertSame('implicit_table_models', $implicit_no_connection[1]);
 
         $explicit_no_connection = $v->parseTable(ExplicitTableModel::class);
-        $this->assertEquals(null, $explicit_no_connection[0]);
+        $this->assertNull($explicit_no_connection[0]);
         $this->assertSame('explicits', $explicit_no_connection[1]);
 
         $noneloquent_no_connection = $v->parseTable(NonEloquentModel::class);
-        $this->assertEquals(null, $noneloquent_no_connection[0]);
+        $this->assertNull($noneloquent_no_connection[0]);
         $this->assertEquals(NonEloquentModel::class, $noneloquent_no_connection[1]);
 
         $raw_no_connection = $v->parseTable('table');
-        $this->assertEquals(null, $raw_no_connection[0]);
+        $this->assertNull($raw_no_connection[0]);
         $this->assertSame('table', $raw_no_connection[1]);
 
         $implicit_connection = $v->parseTable('connection.'.ImplicitTableModel::class);
@@ -4665,10 +4665,13 @@ class ValidationValidatorTest extends TestCase
                 '*.name' => 'required',
             ]);
 
-        $this->assertEquals($v->invalid(), [
-            1 => ['name' => null],
-            2 => ['name' => ''],
-        ]);
+        $this->assertEquals(
+            [
+                1 => ['name' => null],
+                2 => ['name' => ''],
+            ],
+            $v->invalid()
+        );
 
         $v = new Validator($trans,
             [
@@ -4678,9 +4681,12 @@ class ValidationValidatorTest extends TestCase
                 'name' => 'required',
             ]);
 
-        $this->assertEquals($v->invalid(), [
-            'name' => '',
-        ]);
+        $this->assertEquals(
+            [
+                'name' => '',
+            ],
+            $v->invalid()
+        );
     }
 
     public function testValidMethod()
@@ -4698,10 +4704,13 @@ class ValidationValidatorTest extends TestCase
                 '*.name' => 'required',
             ]);
 
-        $this->assertEquals($v->valid(), [
-            0 => ['name' => 'John'],
-            3 => ['name' => 'Doe'],
-        ]);
+        $this->assertEquals(
+            [
+                0 => ['name' => 'John'],
+                3 => ['name' => 'Doe'],
+            ],
+            $v->valid()
+        );
 
         $v = new Validator($trans,
             [
@@ -4715,10 +4724,13 @@ class ValidationValidatorTest extends TestCase
                 'age' => 'required|int',
             ]);
 
-        $this->assertEquals($v->valid(), [
-            'name' => 'Carlos',
-            'gender' => 'male',
-        ]);
+        $this->assertEquals(
+            [
+                'name' => 'Carlos',
+                'gender' => 'male',
+            ],
+            $v->valid()
+        );
     }
 
     public function testNestedInvalidMethod()
@@ -4741,12 +4753,15 @@ class ValidationValidatorTest extends TestCase
                 'regex:/[A-F]{3}[0-9]{3}/',
             ],
         ]);
-        $this->assertEquals($v->invalid(), [
-            'testinvalid' => '',
-            'records' => [
-                3 => 'ADCD23',
+        $this->assertEquals(
+            [
+                'testinvalid' => '',
+                'records' => [
+                    3 => 'ADCD23',
+                ],
             ],
-        ]);
+            $v->invalid()
+        );
     }
 
     public function testMultipleFileUploads()

@@ -144,7 +144,7 @@ class SupportCollectionTest extends TestCase
         $this->assertSame('Taylor', $data->shift());
         $this->assertSame('Otwell', $data->first());
         $this->assertSame('Otwell', $data->shift());
-        $this->assertEquals(null, $data->first());
+        $this->assertNull($data->first());
     }
 
     /**
@@ -3597,6 +3597,20 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(6, $data->pipe(function ($data) {
             return $data->sum();
         }));
+    }
+
+    /**
+     * @dataProvider collectionClassProvider
+     */
+    public function testPipeInto($collection)
+    {
+        $data = new $collection([
+            'first', 'second',
+        ]);
+
+        $instance = $data->pipeInto(TestCollectionMapIntoObject::class);
+
+        $this->assertSame($data, $instance->value);
     }
 
     /**
